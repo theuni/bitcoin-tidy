@@ -16,11 +16,11 @@ void DesigInitCheck::registerMatchers(clang::ast_matchers::MatchFinder *finder)
     using namespace clang::ast_matchers;
 
     // For some reason drilling down from initListExpr does not work. Instead
-    // match against implicitValueInitExpr and check their parents.
+    // match against implicitValueInitExpr and check their ancestors.
 
     finder->addMatcher(
       implicitValueInitExpr(
-        hasParent(
+        hasAncestor(
           initListExpr(has(designatedInitExpr())).bind("initlist"))
       ).bind("implicitval")
     , this);
