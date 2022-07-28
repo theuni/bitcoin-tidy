@@ -10,10 +10,8 @@ To install them, build llvm with clang-tools-extra enabled, and:
 `make install-llvm-headers install-clang-tidy-headers install-clang-headers`
 
 ### Building the plugin:
-- mkdir build
-- cd build
-- cmake ..
-- make
+- cmake -S . -B build
+- cmake --build build
 
 ### Using the plugin:
 
