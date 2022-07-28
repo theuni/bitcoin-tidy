@@ -7,9 +7,15 @@ struct HasDefault
     int val{0};
 };
 
+struct HasNoDefault
+{
+    int val;
+};
+
 struct A {
     struct Options {
         HasDefault defval;
+        HasNoDefault nodefval;
         unsigned cache_size;
         signed delta;
         bool in_memory = false;
@@ -19,7 +25,7 @@ struct A {
 };
 
 
-// Test should warn that A::Options::cache_size is uninitialized.
+// Test should warn that A::Options::cache_size and A::Options::HasNoDefault::val are uninitialized.
 int main() {
     (void)A{
         A::Options{

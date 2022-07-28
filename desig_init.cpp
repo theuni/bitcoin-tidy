@@ -21,7 +21,8 @@ void DesigInitCheck::registerMatchers(clang::ast_matchers::MatchFinder *finder)
     finder->addMatcher(
       implicitValueInitExpr(
         hasAncestor(
-          initListExpr(has(designatedInitExpr())).bind("initlist"))
+          initListExpr(has(designatedInitExpr())).bind("rootinitlist")),
+        hasParent(initListExpr().bind("initlist"))
       ).bind("implicitval")
     , this);
 }
@@ -30,8 +31,20 @@ void DesigInitCheck::check(const clang::ast_matchers::MatchFinder::MatchResult &
 {
     if (const auto* member = Result.Nodes.getNodeAs<clang::ImplicitValueInitExpr>("implicitval")) {
         if (const auto* init = Result.Nodes.getNodeAs<clang::InitListExpr>("initlist")) {
-            std::string membertype = member->getType().getAsString();
-            diag(init->getBeginLoc(), "Designated initializer with uninitialized member of type: " + membertype);
+            if (const auto* rootinit = Result.Nodes.getNodeAs<clang::InitListExpr>("rootinitlist")) {
+                auto rootinitid = rootinit->getID(*Result.Context);
+                auto initid = init->getID(*Result.Context);
+                std::string membertype = member->getType().getAsString();
+                auto rootstmt = rootinit->getExprStmt();
+                auto roottype = rootstmt->getType().getCanonicalType().getAsString();
+                if (initid == rootinitid) {
+                    diag(rootinit->getBeginLoc(), "Designated initializer for " + roottype + " has uninitialized member of type " + membertype);
+                } else {
+                    auto nestedstmt = init->getExprStmt();
+                    auto nestedtype = nestedstmt->getType().getCanonicalType().getAsString();
+                    diag(rootinit->getBeginLoc(), "Designated initializer for " + roottype + " contains nested object of type " +  nestedtype  + " with unitialized member of type " + membertype);
+                }
+            }
         }
     }
 }
