@@ -15,15 +15,16 @@ To install them, build llvm with clang-tools-extra enabled, and:
 
 ### Using the plugin:
 
-Example bitcoin-init-list usage:
+Example bitcoin-init-list usage (paths snipped):
 
-``clang-tidy --load=`pwd`/libbitcoin-tidy.so -checks='-*,bitcoin-init-list' ../test_desig_init.cpp -- -std=c++17``
+``$ clang-tidy --load=build/libbitcoin-tidy.so -checks='-*,bitcoin-init-list' test_desig_init.cpp -- -std=c++17``
 
 ```
-1 warning generated.
-/home/cory/dev/bitcoin-tidy/build/../test_desig_init.cpp:25:19: warning: Designated initializer with uninitialized member of type: unsigned int [bitcoin-init-list]
+2 warnings generated.
+test_desig_init.cpp:31:19: warning: Designated initializer for struct A::Options contains nested object of type struct HasNoDefault with unitialized member of type int [bitcoin-init-list]
         A::Options{
                   ^
+test_desig_init.cpp:31:19: warning: Designated initializer for struct A::Options has uninitialized member of type unsigned int [bitcoin-init-list]
 ```
 
 ### Caveats:
