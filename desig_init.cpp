@@ -35,14 +35,12 @@ void DesigInitCheck::check(const clang::ast_matchers::MatchFinder::MatchResult &
     if (!member || !init || !rootinit) return;
 
     std::string membertype = member->getType().getAsString();
-    auto rootstmt = rootinit->getExprStmt();
-    auto roottype = rootstmt->getType().getCanonicalType().getAsString();
+    auto roottype = rootinit->getType().getCanonicalType().getAsString();
 
     if (rootinit->getID(*Result.Context) == init->getID(*Result.Context)) {
         diag(rootinit->getBeginLoc(), "Designated initializer for " + roottype + " has uninitialized member of type " + membertype);
     } else {
-        auto nestedstmt = init->getExprStmt();
-        auto nestedtype = nestedstmt->getType().getCanonicalType().getAsString();
+        auto nestedtype = init->getType().getCanonicalType().getAsString();
         diag(rootinit->getBeginLoc(), "Designated initializer for " + roottype + " contains nested object of type " +  nestedtype  + " with unitialized member of type " + membertype);
     }
 }
